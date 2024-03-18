@@ -5,14 +5,13 @@ var __importDefault =
         return mod && mod.__esModule ? mod : { default: mod };
     };
 Object.defineProperty(exports, '__esModule', { value: true });
-exports.createVerificationMethod = void 0;
 const ed25519_signature_2018_1 = require('@transmute/ed25519-signature-2018');
 const base_58_1 = __importDefault(require('base-58'));
 class KeyMethod {
     /**
      *
      * @param node BIP32Interface
-     * @returns {KeysInterface} { did, address, privateKey, publicKey, chainCode, verificationKey }.
+     * @returns {KeysInterface} { did, address, privateKey, publicKey, chainCode, didDocument }.
      */
     async getKeys(node) {
         var _a, _b;
@@ -20,7 +19,7 @@ class KeyMethod {
             (_a = node.privateKey) === null || _a === void 0 ? void 0 : _a.toString('hex');
         const chainCode =
             (_b = node.chainCode) === null || _b === void 0 ? void 0 : _b.toString('hex');
-        const verificationKey = await createVerificationMethod(privateKey, true);
+        const verificationKey = await this.createVerificationMethod(privateKey);
         const publicKey = Buffer.from(
             base_58_1.default.decode(verificationKey.publicKeyBase58)
         ).toString('hex');
@@ -31,10 +30,11 @@ class KeyMethod {
     }
     /**
      *
-     * @param privateKey - private key in Buffer or Hex string format
+     * @param privateKey - private key as a hex string
+     * @returns {CreateDidDocumentInterface}
      */
     async getDocument(privateKey) {
-        const verificationKey = await createVerificationMethod(privateKey);
+        const verificationKey = await this.createVerificationMethod(privateKey);
         const didDocument = {
             '@context': [
                 'https://www.w3.org/ns/did/v1',
@@ -50,19 +50,24 @@ class KeyMethod {
         };
         return { didDocument };
     }
+    /**
+     *
+     * @param seed - seed as a hex string
+     * @param includePrivateKey - include private key
+     * @returns {VerificationKeyInterface}
+     */
+    async createVerificationMethod(seed, includePrivateKey = false) {
+        const k = await ed25519_signature_2018_1.Ed25519VerificationKey2018.generate({
+            secureRandom: () => {
+                return Buffer.from(seed, 'hex');
+            }
+        });
+        let jwk = await k.export({
+            privateKey: includePrivateKey,
+            type: 'Ed25519VerificationKey2018'
+        });
+        return jwk;
+    }
 }
 exports.default = KeyMethod;
-async function createVerificationMethod(seed, includePvt = false) {
-    const k = await ed25519_signature_2018_1.Ed25519VerificationKey2018.generate({
-        secureRandom: () => {
-            return Buffer.from(seed, 'hex');
-        }
-    });
-    let jwk = await k.export({
-        privateKey: includePvt,
-        type: 'Ed25519VerificationKey2018'
-    });
-    return jwk;
-}
-exports.createVerificationMethod = createVerificationMethod;
 //# sourceMappingURL=index.js.map

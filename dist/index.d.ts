@@ -1,21 +1,24 @@
-/// <reference types="node" />
 export default class KeyMethod {
     /**
      *
      * @param node BIP32Interface
-     * @returns {KeysInterface} { did, address, privateKey, publicKey, chainCode, verificationKey }.
+     * @returns {KeysInterface} { did, address, privateKey, publicKey, chainCode, didDocument }.
      */
     getKeys(node: BIP32Interface): Promise<KeysInterface>;
     /**
      *
-     * @param privateKey - private key in Buffer or Hex string format
+     * @param privateKey - private key as a hex string
+     * @returns {CreateDidDocumentInterface}
      */
-    getDocument(privateKey: Buffer | string): Promise<CreateDidDocumentInterface>;
+    getDocument(privateKey: string): Promise<CreateDidDocumentInterface>;
+    /**
+     *
+     * @param seed - seed as a hex string
+     * @param includePrivateKey - include private key
+     * @returns {VerificationKeyInterface}
+     */
+    createVerificationMethod(
+        seed: string,
+        includePrivateKey?: boolean
+    ): Promise<VerificationKeyInterface>;
 }
-export declare function createVerificationMethod(
-    seed: any,
-    includePvt?: boolean
-): Promise<
-    | import('@transmute/ed25519-key-pair').JsonWebKey2020
-    | import('@transmute/ed25519-key-pair').Ed25519VerificationKey2018
->;

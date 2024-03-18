@@ -36,5 +36,6 @@ interface CreateDidDocumentInterface {
 interface MethodInterface {
     getKeys(node: BIP32Interface): Promise<KeysInterface>;
     getMasterKeys(): Promise<KeysInterface>;
-    getDocument(): any;
+    getDocument(): Promise<CreateDidDocumentInterface>;
+    createVerificationMethod(): Promise<VerificationKeyInterface>;
 }
