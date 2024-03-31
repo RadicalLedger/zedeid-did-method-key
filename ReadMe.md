@@ -1,6 +1,6 @@
 # DID Method Key
 
-Library for generating and working with Ed25519VerificationKey2018 key pairs
+Library for generating and working with Ed25519VerificationKey2018 key pairs.
 
 # Installation
 
